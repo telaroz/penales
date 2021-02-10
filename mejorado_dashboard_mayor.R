@@ -3,13 +3,17 @@ library(shinydashboard)
 library(ggplot2)
 library(shinyWidgets)
 library(data.table)
+library(shinyjs)
 
 ui <- dashboardPage(
+
   dashboardHeader(title = 'Anotador de Penales'),
   dashboardSidebar(collapsed = TRUE),
   dashboardBody(
     
-    fluidRow(column(width = 2, radioGroupButtons(
+    fluidRow(
+      shinyjs::useShinyjs(),
+      column(width = 2, radioGroupButtons(
       inputId = "tirador",
       label = "Tirador ",
       choices = c(sort(c("Yamal", "Santiago", "Johann", 'Emmanuel', 'Rafael', 'Justin', 'David Jimenez', 
@@ -36,6 +40,12 @@ ui <- dashboardPage(
         yes = icon("ok", 
                    lib = "glyphicon"))
     ),radioGroupButtons(inputId = "color",label = "Gol", choices =  c("Gol", "No Gol"), size = 'lg'),
+    sliderTextInput(
+      inputId = "fatiga",
+      label = "Cansancio", 
+      choices = seq(0L, 10L, 1L),
+      grid = TRUE
+    ),
     checkboxGroupButtons(
       inputId = "Adicionales", 
       label = "Tipo de tiro adicional",
@@ -54,13 +64,17 @@ ui <- dashboardPage(
       value = FALSE,
       status = "primary"
     ),
+
+    sliderInput("posicion_portero", "Salida del portero en metros",
+                min = 0, max = 4,
+                value = 0, step = 0.25),
     
-    sliderTextInput(
-      inputId = "posicion_portero",
-      label = "Salida del portero en metros", 
-      choices = seq(0,4,0.25),
-      grid = TRUE
-    ),
+    # sliderTextInput(
+    #   inputId = "posicion_portero",
+    #   label = "Salida del portero en metros", 
+    #   choices = seq(0, 4, 0.25),
+    #   grid = TRUE
+    # ),
     
     checkboxGroupButtons(
       inputId = "infraccion", 
@@ -73,7 +87,8 @@ ui <- dashboardPage(
                      style = "color: steelblue"),
         no = tags$i(class = "fa fa-square-o", 
                     style = "color: steelblue"))
-    )), 
+    ),   
+    textInput("comentarios", "Comentario", "")), 
     column(width = 6,
            h4("Click en el gráfico para agregar el tiro"),
            actionButton("rem_point", "Quite el último dato"),
@@ -82,7 +97,6 @@ ui <- dashboardPage(
            h4("Tiros realizados"),
            tableOutput("table"))),
     downloadButton("download", "Descargar Sesión", size = 'lg'))
-  
   
   
   
@@ -103,8 +117,10 @@ server <- function(input, output) {
                           hora = character(),
                           adicional = character(),
                           infraccion = character(),
-                          posicion_portero = character(),
-                          tiro_igual_finta = logical())
+                          posicion_portero = numeric(),
+                          tiro_igual_finta = logical(),
+                          fatiga = integer(),
+                          comentario = character())
   
   # Create a plot
   output$plot1 = renderPlot({
@@ -132,7 +148,9 @@ server <- function(input, output) {
                           adicional = paste0(sort(input$Adicionales), collapse = '_'),
                           infraccion = paste0(sort(input$infraccion), collapse = '_'),
                           posicion_portero = paste0(sort(input$posicion_portero), collapse = '_'),
-                          tiro_igual_finta = input$material_finta)
+                          tiro_igual_finta = input$material_finta,
+                          fatiga = input$fatiga,
+                          comentario = input$comentarios)
     values$DT <- rbind(values$DT, add_row)
   })
   
@@ -152,14 +170,17 @@ server <- function(input, output) {
   # Add a download button
   output$download <- downloadHandler(
     filename = function() {
-      paste0(input$dataset, ".csv")
+      paste0('penales_mayor', Sys.Date(),'.csv')
     },
     content = function(file) {
       data.table::fwrite(values$DT, file)
     }
   )
   
-  
+  observeEvent(input$plot_click, {
+    shinyjs::reset(id = 'comentarios')
+    shinyjs::reset(id = 'posicion_portero')
+  })
   
 }
 
