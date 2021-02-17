@@ -30,8 +30,7 @@ ui <- dashboardPage(
                                                    "Manfred", "Freddy", "Jorge", 'Daniel Villegas', 'Valery')), 
                                             sort(c("Bryan R.", "Christopher", "David Herrera", 'Esteban', 'Shadir', 'Noé',
                                                    'Óscar Lira', 'David Jiménez', 'David Vindas', 'Jeremy')), 
-                                            c('Invitado 1', 'Invitado 2',
-                                              'Invitado 3', 'Invitado 4', 'Invitado 5')), 
+                                            c('Invitado 1', 'Invitado 2')), 
                                           selected = sort(c("Yamal", "Santiago", "Johann", 'Emmanuel', 'Rafael', 'Justin', 'David Jimenez', 
                                                             "Daniel Meza", "David Molina", "Erick", 'Julio', 'Óscar Solórzano', 'Viggo', 'Manuel',
                                                             "Manfred", "Freddy", "Jorge", 'Daniel Villegas', 'Valery')),
@@ -46,7 +45,7 @@ ui <- dashboardPage(
               
               column(width = 5,
                      checkboxGroupButtons(inputId = "escogencia_mayor_porteros", "Escogencia Porteros Entrenamiento Mayor",
-                                          c(sort(c("Adrian", "Bryan", 'Jepherson')), sort(c("Isaac", "Alejandro", 'Mario', 'Andrés'))), 
+                                          c(sort(c("Adrian", "Bryan", 'Jepherson')), sort(c("Isaac", "Alejandro", 'Mario', 'Andrés')), 'Invitado1'), 
                                           selected = sort(c("Adrian", "Bryan", 'Jepherson')),
                                           status = "primary", 
                                           direction = 'vertical',
@@ -64,8 +63,7 @@ ui <- dashboardPage(
                                                        sort(c("Yamal", "Santiago", 'Rafael', 'Justin', 'David Jimenez', 
                                                               "Daniel Meza", "David Molina", "Erick", 'Julio', 'Óscar Solórzano', 'Manuel',
                                                               "Manfred", "Freddy", "Jorge", 'Daniel Villegas', 'Valery')),
-                                                       c('Invitado 1', 'Invitado 2',
-                                                         'Invitado 3', 'Invitado 4', 'Invitado 5')), 
+                                                       c('Invitado 1', 'Invitado 2')), 
                                                      selected = sort(c("Bryan R.", "Christopher", "David Herrera", 'Emmanuel', 'Esteban', 'Shadir', 'Noé',
                                                                        'Óscar Lira', 'Viggo', 'Johann', 'David Jiménez', 'David Vindas', 'Jeremy')),
                                                      status = "primary", 
@@ -78,7 +76,7 @@ ui <- dashboardPage(
               
               column(width = 5,
                      checkboxGroupButtons(inputId = "escogencia_juvenil_porteros", "Escogencia Jugadores Entrenamiento Juvenil",
-                                          c(sort(c("Isaac", "Alejandro", 'Mario', 'Andrés')), sort(c("Adrian", "Bryan", 'Jepherson'))), 
+                                          c(sort(c("Isaac", "Alejandro", 'Mario', 'Andrés')), sort(c("Adrian", "Bryan", 'Jepherson')), 'Invitado1'), 
                                           selected = sort(c("Isaac", "Alejandro", 'Mario', 'Andrés')),
                                           status = "primary", 
                                           direction = 'vertical',
@@ -285,12 +283,12 @@ server <- function(input, output, session) {
   jugadores_juvenil <- sort(c("Bryan R.", "Christopher", "David Herrera", 'Emmanuel', 'Esteban', 'Shadir', 'Noé',
                               'Óscar Lira', 'Viggo', 'Johann', 'David Jiménez', 'David Vindas', 'Jeremy'))
   
-  jugadores <- unique(c(jugadores_mayor, jugadores_juvenil))
+  jugadores <- unique(c(jugadores_mayor, jugadores_juvenil, 'Invitado1', 'Invitado2', 'Invitado3'))
   
   
   porteros_mayor <- sort(c("Adrian", "Bryan", 'Jepherson'))
   porteros_juvenil <- sort(c("Isaac", "Alejandro", 'Mario', 'Andrés'))
-  porteros <- unique(c(porteros_mayor, porteros_juvenil))
+  porteros <- unique(c(porteros_mayor, porteros_juvenil, 'Invitado1'))
   
   
   observeEvent(input$escogencia_mayor, {
