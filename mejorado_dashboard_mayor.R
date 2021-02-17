@@ -1,16 +1,94 @@
+library(shiny)
 library(shinydashboard)
+library(ggplot2)
+library(shinyWidgets)
+library(data.table)
+library(shinyjs)
+
+
 
 ui <- dashboardPage(
+  
   dashboardHeader(title = "Anotador de Penales"),
   
   dashboardSidebar(collapsed = TRUE,
                    sidebarMenu(
                      menuItem("Selección Mayor", tabName = "dashboard", icon = icon("people-carry")),
-                     menuItem("Selección Juvenil", tabName = "widgets", icon = icon("child"))
+                     menuItem('Escogencia de Jugadores: Mayor', tabName = 'escogencia_M'),
+                     menuItem("Selección Juvenil", tabName = "widgets", icon = icon("child")),
+                     menuItem('Escogencia de Jugadores: Juvenil', tabName = 'escogencia_J')
                    )
   ),
   dashboardBody(
     tabItems(
+      
+      tabItem(tabName = 'escogencia_M',
+              column(width = 5,
+                     checkboxGroupButtons(inputId = "escogencia_mayor", "Escogencia Jugadores Entrenamiento Mayor",
+                                          c(sort(c("Yamal", "Santiago", "Johann", 'Emmanuel', 'Rafael', 'Justin', 'David Jimenez', 
+                                                   "Daniel Meza", "David Molina", "Erick", 'Julio', 'Óscar Solórzano', 'Viggo', 'Manuel',
+                                                   "Manfred", "Freddy", "Jorge", 'Daniel Villegas', 'Valery')), 
+                                            sort(c("Bryan R.", "Christopher", "David Herrera", 'Esteban', 'Shadir', 'Noé',
+                                                   'Óscar Lira', 'David Jiménez', 'David Vindas', 'Jeremy')), 
+                                            c('Invitado 1', 'Invitado 2',
+                                              'Invitado 3', 'Invitado 4', 'Invitado 5')), 
+                                          selected = sort(c("Yamal", "Santiago", "Johann", 'Emmanuel', 'Rafael', 'Justin', 'David Jimenez', 
+                                                            "Daniel Meza", "David Molina", "Erick", 'Julio', 'Óscar Solórzano', 'Viggo', 'Manuel',
+                                                            "Manfred", "Freddy", "Jorge", 'Daniel Villegas', 'Valery')),
+                                          status = "primary", 
+                                          direction = 'vertical',
+                                          checkIcon = list(
+                                            yes = icon("ok", 
+                                                       lib = "glyphicon"),
+                                            no = icon("remove",
+                                                      lib = "glyphicon")))),
+              
+              
+              column(width = 5,
+                     checkboxGroupButtons(inputId = "escogencia_mayor_porteros", "Escogencia Porteros Entrenamiento Mayor",
+                                          c(sort(c("Adrian", "Bryan", 'Jepherson')), sort(c("Isaac", "Alejandro", 'Mario', 'Andrés'))), 
+                                          selected = sort(c("Adrian", "Bryan", 'Jepherson')),
+                                          status = "primary", 
+                                          direction = 'vertical',
+                                          checkIcon = list(
+                                            yes = icon("ok", 
+                                                       lib = "glyphicon"),
+                                            no = icon("remove",
+                                                      
+                                            ))))),
+      tabItem(tabName = 'escogencia_J',
+              
+              column(width = 5, checkboxGroupButtons(inputId = "escogencia_juvenil", "Escogencia Jugadores Entrenamiento Juvenil",
+                                                     c(sort(c("Bryan R.", "Christopher", "David Herrera", 'Emmanuel', 'Esteban', 'Shadir', 'Noé',
+                                                              'Óscar Lira', 'Viggo', 'Johann', 'David Jiménez', 'David Vindas', 'Jeremy')),
+                                                       sort(c("Yamal", "Santiago", 'Rafael', 'Justin', 'David Jimenez', 
+                                                              "Daniel Meza", "David Molina", "Erick", 'Julio', 'Óscar Solórzano', 'Manuel',
+                                                              "Manfred", "Freddy", "Jorge", 'Daniel Villegas', 'Valery')),
+                                                       c('Invitado 1', 'Invitado 2',
+                                                         'Invitado 3', 'Invitado 4', 'Invitado 5')), 
+                                                     selected = sort(c("Bryan R.", "Christopher", "David Herrera", 'Emmanuel', 'Esteban', 'Shadir', 'Noé',
+                                                                       'Óscar Lira', 'Viggo', 'Johann', 'David Jiménez', 'David Vindas', 'Jeremy')),
+                                                     status = "primary", 
+                                                     direction = 'vertical',
+                                                     checkIcon = list(
+                                                       yes = icon("ok", 
+                                                                  lib = "glyphicon"),
+                                                       no = icon("remove",
+                                                                 lib = "glyphicon")))),
+              
+              column(width = 5,
+                     checkboxGroupButtons(inputId = "escogencia_juvenil_porteros", "Escogencia Jugadores Entrenamiento Juvenil",
+                                          c(sort(c("Isaac", "Alejandro", 'Mario', 'Andrés')), sort(c("Adrian", "Bryan", 'Jepherson'))), 
+                                          selected = sort(c("Isaac", "Alejandro", 'Mario', 'Andrés')),
+                                          status = "primary", 
+                                          direction = 'vertical',
+                                          checkIcon = list(
+                                            yes = icon("ok", 
+                                                       lib = "glyphicon"),
+                                            no = icon("remove",
+                                                      lib = "glyphicon"))))
+              
+      ),
       # First tab content
       tabItem(tabName = "dashboard",
               
@@ -20,11 +98,9 @@ ui <- dashboardPage(
                 column(width = 2, radioGroupButtons(
                   inputId = "tirador",
                   label = "Tirador ",
-                  choices = c(sort(c("Yamal", "Santiago", "Johann", 'Emmanuel', 'Rafael', 'Justin', 'David Jimenez', 
-                                     "Daniel Meza", "David Molina", "Erick", 'Julio', 'Óscar Solórzano', 'Viggo', 'Manuel',
-                                     "Manfred", "Freddy", "Jorge", 'Daniel Villegas', 'Valery')),
-                              c('Invitado 1', 'Invitado 2',
-                                'Invitado 3', 'Invitado 4', 'Invitado 5')),
+                  choices = sort(c("Yamal", "Santiago", "Johann", 'Emmanuel', 'Rafael', 'Justin', 'David Jimenez', 
+                                   "Daniel Meza", "David Molina", "Erick", 'Julio', 'Óscar Solórzano', 'Viggo', 'Manuel',
+                                   "Manfred", "Freddy", "Jorge", 'Daniel Villegas', 'Valery')),
                   # size = 'lg',
                   direction = 'vertical',
                   individual = FALSE,
@@ -115,9 +191,7 @@ ui <- dashboardPage(
                   inputId = "tirador2",
                   label = "Tirador ",
                   choices = c(sort(c("Bryan R.", "Christopher", "David Herrera", 'Emmanuel', 'Esteban', 'Shadir', 'Noé',
-                                     'Óscar Lira', 'Viggo', 'Johann', 'David Jiménez', 'David Vindas', 'Jeremy')),
-                              c('Invitado 1', 'Invitado 2',
-                                'Invitado 3', 'Invitado 4', 'Invitado 5')),
+                                     'Óscar Lira', 'Viggo', 'Johann', 'David Jiménez', 'David Vindas', 'Jeremy'))),
                   # size = 'lg',
                   direction = 'vertical',
                   individual = FALSE,
@@ -129,7 +203,7 @@ ui <- dashboardPage(
                 column(width = 2, radioGroupButtons(
                   inputId = "portero2",
                   label = "Portero ",
-                  choices = c("Isaac", "Jorge", 'Mario', 'Andrés'),
+                  choices = c("Isaac", "Alejandro", 'Mario', 'Andrés'),
                   # size = 'lg',
                   direction = 'horizontal',
                   individual = FALSE,
@@ -201,15 +275,73 @@ ui <- dashboardPage(
   )
 )
 
-server <- function(input, output) {
+server <- function(input, output, session) {
   
   
+  jugadores_mayor <- sort(c("Yamal", "Santiago", "Johann", 'Emmanuel', 'Rafael', 'Justin', 'David Jimenez', 
+                            "Daniel Meza", "David Molina", "Erick", 'Julio', 'Óscar Solórzano', 'Viggo', 'Manuel',
+                            "Manfred", "Freddy", "Jorge", 'Daniel Villegas', 'Valery'))
+  
+  jugadores_juvenil <- sort(c("Bryan R.", "Christopher", "David Herrera", 'Emmanuel', 'Esteban', 'Shadir', 'Noé',
+                              'Óscar Lira', 'Viggo', 'Johann', 'David Jiménez', 'David Vindas', 'Jeremy'))
+  
+  jugadores <- unique(c(jugadores_mayor, jugadores_juvenil))
   
   
+  porteros_mayor <- sort(c("Adrian", "Bryan", 'Jepherson'))
+  porteros_juvenil <- sort(c("Isaac", "Alejandro", 'Mario', 'Andrés'))
+  porteros <- unique(c(porteros_mayor, porteros_juvenil))
   
   
+  observeEvent(input$escogencia_mayor, {
+    jugadores_escogidos <- jugadores[jugadores %in% input$escogencia_mayor]
+    
+    # Method 1
+    updateRadioGroupButtons(session = session, inputId = "tirador",
+                            choices = jugadores_escogidos, selected = jugadores_mayor, status = 'primary', checkIcon = list(
+                              yes = icon("ok", 
+                                         lib = "glyphicon")))
+    
+    
+  }, ignoreInit = TRUE)
   
   
+  observeEvent(input$escogencia_juvenil, {
+    jugadores_escogidos <- jugadores[jugadores %in% input$escogencia_juvenil]
+    
+    # Method 1
+    updateRadioGroupButtons(session = session, inputId = "tirador2",
+                            choices = jugadores_escogidos, selected = jugadores_juvenil, status = 'primary', checkIcon = list(
+                              yes = icon("ok", 
+                                         lib = "glyphicon")))
+    
+    
+  }, ignoreInit = TRUE)
+  
+  observeEvent(input$escogencia_juvenil_porteros, {
+    porteros_escogidos <- porteros[porteros %in% input$escogencia_juvenil_porteros]
+    
+    # Method 1
+    updateRadioGroupButtons(session = session, inputId = "portero2",
+                            choices = porteros_escogidos, selected = porteros_juvenil, status = 'primary', checkIcon = list(
+                              yes = icon("ok", 
+                                         lib = "glyphicon")))
+    
+    
+  }, ignoreInit = TRUE)
+  
+  
+  observeEvent(input$escogencia_mayor_porteros, {
+    porteros_escogidos <- porteros[porteros %in% input$escogencia_mayor_porteros]
+    
+    # Method 1
+    updateRadioGroupButtons(session = session, inputId = "portero",
+                            choices = porteros_escogidos, selected = porteros_mayor, status = 'primary', checkIcon = list(
+                              yes = icon("ok", 
+                                         lib = "glyphicon")))
+    
+    
+  }, ignoreInit = TRUE)
   
   
   
